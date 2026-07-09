@@ -78,22 +78,26 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "UDO Farm — Bulk Farm Produce Marketplace on Pi Network" },
+      { title: "UDO Farm — Cultivating Progress, Harvesting the Future" },
       {
         name: "description",
         content:
-          "Buy and sell bulk farm produce with Pi. UDO Farm connects farmers and buyers across grains, vegetables, fruits and tubers. Cultivating progress, harvesting the future.",
+          "Africa's Pi Network marketplace for bulk farm produce. Grains, vegetables, fruits and tubers by the ton. Pay with Pi. Pickup or delivery 24/7.",
       },
       { name: "author", content: "UDO Farm" },
       { name: "theme-color", content: "#6F42C1" },
-      { property: "og:title", content: "UDO Farm — Bulk Produce Marketplace on Pi" },
+      { property: "og:title", content: "UDO Farm — Cultivating Progress, Harvesting the Future" },
       {
         property: "og:description",
         content:
-          "The Jumia + Alibaba of African agriculture. Bulk produce, Pi Payments, pickup or delivery.",
+          "Africa's Pi Network marketplace for bulk farm produce. Grains, vegetables, fruits and tubers by the ton. Pay with Pi. Pickup or delivery 24/7.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "UDO Farm — Cultivating Progress, Harvesting the Future" },
+      { name: "twitter:description", content: "Africa's Pi Network marketplace for bulk farm produce. Grains, vegetables, fruits and tubers by the ton. Pay with Pi. Pickup or delivery 24/7." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/1yZyzPza60XGlJ5tXQZ1nNMLzxJ2/social-images/social-1783617995667-1000414238.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/1yZyzPza60XGlJ5tXQZ1nNMLzxJ2/social-images/social-1783617995667-1000414238.webp" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
