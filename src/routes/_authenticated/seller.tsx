@@ -191,7 +191,7 @@ function OrderStatusActions({
   status: string;
   onDone: () => void;
 }) {
-  async function update(next: string) {
+  async function update(next: "SHIPPED" | "DELIVERED") {
     await supabase.from("orders").update({ status: next }).eq("id", orderId);
     onDone();
   }
