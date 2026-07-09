@@ -68,7 +68,7 @@ function Marketplace() {
   });
 
   function updateSearch(patch: Partial<z.infer<typeof searchSchema>>) {
-    navigate({ search: (old) => ({ ...old, ...patch }) });
+    navigate({ search: (old: z.infer<typeof searchSchema>) => ({ ...old, ...patch }) });
   }
 
   return (
