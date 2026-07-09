@@ -63,8 +63,8 @@ function Checkout() {
 
   async function pay() {
     if (!userId) return;
-    if (quantity > Number(product.live_inventory)) {
-      toast.error(`Only ${product.live_inventory} ${product.unit}s available`);
+    if (quantity > Number(p.live_inventory)) {
+      toast.error(`Only ${p.live_inventory} ${p.unit}s available`);
       return;
     }
     if (deliveryType === "DELIVERY" && !address.trim()) {
@@ -79,7 +79,7 @@ function Checkout() {
         .from("orders")
         .insert({
           buyer_id: userId,
-          product_id: product.id,
+          product_id: p.id,
           quantity,
           total_price_pi: total,
           delivery_type: deliveryType,
@@ -97,8 +97,8 @@ function Checkout() {
         piCreatePayment(
           {
             amount: total,
-            memo: `UDO Farm order · ${product.title}`,
-            metadata: { orderId: order.id, productId: product.id },
+            memo: `UDO Farm order · ${p.title}`,
+            metadata: { orderId: order.id, productId: p.id },
           },
           {
             onReadyForServerApproval: async (paymentId) => {
@@ -138,14 +138,14 @@ function Checkout() {
           status: "COMPLETED",
           order_id: order.id,
           user_id: userId,
-          memo: `Mock payment · ${product.title}`,
+          memo: `Mock payment · ${p.title}`,
           metadata: { mock: true, orderId: order.id },
         });
         await supabase.from("orders").update({ status: "PAID" }).eq("id", order.id);
         await supabase
           .from("products")
-          .update({ live_inventory: Number(product.live_inventory) - quantity })
-          .eq("id", product.id);
+          .update({ live_inventory: Number(p.live_inventory) - quantity })
+          .eq("id", p.id);
         toast.success("Mock payment complete! (Pi Browser required for real Pi payments)");
         navigate({ to: "/orders" });
       }
@@ -174,28 +174,28 @@ function Checkout() {
         <Card className="mt-6 overflow-hidden">
           <div className="flex gap-4 border-b border-border bg-muted/30 p-4">
             <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-muted">
-              {product.images?.[0] && <img src={product.images[0]} alt="" className="h-full w-full object-cover" />}
+              {p.images?.[0] && <img src={p.images[0]} alt="" className="h-full w-full object-cover" />}
             </div>
             <div className="flex-1">
-              <p className="font-semibold">{product.title}</p>
+              <p className="font-semibold">{p.title}</p>
               <p className="text-sm text-muted-foreground">
-                @{(product.profiles as unknown as { pi_username: string } | null)?.pi_username} · {product.price_per_unit} π / {product.unit}
+                @{(p.profiles as unknown as { pi_username: string } | null)?.pi_username} · {p.price_per_unit} π / {p.unit}
               </p>
             </div>
           </div>
 
           <div className="space-y-5 p-5">
             <div>
-              <Label htmlFor="qty">Quantity ({product.unit}s)</Label>
+              <Label htmlFor="qty">Quantity ({p.unit}s)</Label>
               <Input
                 id="qty"
                 type="number"
                 min={1}
-                max={Number(product.live_inventory)}
+                max={Number(p.live_inventory)}
                 value={quantity}
                 onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
               />
-              <p className="mt-1 text-xs text-muted-foreground">Max available: {product.live_inventory}</p>
+              <p className="mt-1 text-xs text-muted-foreground">Max available: {p.live_inventory}</p>
             </div>
 
             <div>
@@ -238,7 +238,7 @@ function Checkout() {
           </div>
 
           <div className="space-y-2 border-t border-border bg-muted/20 p-5 text-sm">
-            <Row label={`${quantity} × ${product.title}`} value={`${subtotal.toFixed(2)} π`} />
+            <Row label={`${quantity} × ${p.title}`} value={`${subtotal.toFixed(2)} π`} />
             <Row label="Delivery" value={`${deliveryFee.toFixed(2)} π`} />
             <div className="flex justify-between border-t border-border pt-2 font-display text-lg font-bold">
               <span>Total</span>
