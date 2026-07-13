@@ -10,7 +10,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { isPiBrowser, piAuthenticate } from "@/lib/pi";
+import { isPiBrowserSync, piAuthenticate } from "@/lib/pi";
 import { signInWithPi } from "@/lib/auth.functions";
 import { z } from "zod";
 
