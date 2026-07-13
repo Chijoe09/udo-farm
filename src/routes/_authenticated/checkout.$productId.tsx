@@ -11,7 +11,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/use-session";
 import { toast } from "sonner";
-import { isPiBrowser, piCreatePayment } from "@/lib/pi";
+import { isPiBrowserSync, piCreatePayment } from "@/lib/pi";
 import { Truck, MapPin, ShieldCheck, Info } from "lucide-react";
 import { z } from "zod";
 
