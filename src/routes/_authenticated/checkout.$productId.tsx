@@ -93,8 +93,8 @@ function Checkout() {
       if (orderErr || !order) throw orderErr ?? new Error("Order failed");
 
       // 2. Create Pi payment (real or mock)
-      if (isPiBrowser()) {
-        piCreatePayment(
+      if (isPiBrowserSync()) {
+        await piCreatePayment(
           {
             amount: total,
             memo: `UDO Farm order · ${p.title}`,
@@ -162,7 +162,7 @@ function Checkout() {
         <h1 className="font-display text-3xl font-bold">Checkout</h1>
         <p className="mt-1 text-muted-foreground">Review and pay with Pi.</p>
 
-        {!isPiBrowser() && (
+        {!isPiBrowserSync() && (
           <div className="mt-4 flex items-start gap-2 rounded-xl bg-warning/10 p-3 text-sm">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
             <p className="text-warning-foreground/90">
