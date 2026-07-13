@@ -1,13 +1,8 @@
 /**
  * Pi Network SDK wrapper.
  *
- * The Pi Browser injects `window.Pi`. Outside Pi Browser (regular desktop/mobile
- * chrome), `window.Pi` is undefined and we run in "mock mode" for development.
- *
- * To go live:
- *   1. Register the app on the Pi Developer Portal.
- *   2. Save PI_API_KEY as a Lovable Cloud secret.
- *   3. Set VITE_PI_SANDBOX to "false" for production.
+ * The Pi Browser injects `window.Pi` via the SDK script loaded in __root.tsx.
+ * Outside Pi Browser, `window.Pi` never appears and calls throw.
  */
 
 export type PiAuthResult = {
@@ -29,7 +24,7 @@ export type PiPaymentCallbacks = {
 };
 
 type PiSDK = {
-  init: (opts: { version: string; sandbox: boolean }) => void;
+  init: (opts: { version: string; sandbox: boolean }) => void | Promise<void>;
   authenticate: (
     scopes: string[],
     onIncompletePaymentFound: (payment: unknown) => void,
@@ -43,34 +38,54 @@ declare global {
   }
 }
 
-export const isPiBrowser = () =>
-  typeof window !== "undefined" && typeof window.Pi !== "undefined";
-
-let initialized = false;
-export function initPi() {
-  if (initialized || !isPiBrowser()) return;
-  const sandbox = (import.meta.env.VITE_PI_SANDBOX ?? "true") !== "false";
-  window.Pi!.init({ version: "2.0", sandbox });
-  initialized = true;
-}
-
-export async function piAuthenticate(): Promise<PiAuthResult> {
-  initPi();
-  if (!isPiBrowser()) {
-    throw new Error("Pi Browser required. Open UDO Farm inside the Pi Browser to sign in.");
-  }
-  return window.Pi!.authenticate(["username", "payments"], () => {
-    // TODO: handle incomplete payments — recover on server via /api/public/pi/complete
+/** Wait for the Pi SDK script (loaded async in __root.tsx) to attach window.Pi. */
+async function waitForPiSDK(timeoutMs = 4000): Promise<PiSDK | null> {
+  if (typeof window === "undefined") return null;
+  if (window.Pi) return window.Pi;
+  const start = Date.now();
+  return new Promise((resolve) => {
+    const tick = () => {
+      if (window.Pi) return resolve(window.Pi);
+      if (Date.now() - start > timeoutMs) return resolve(null);
+      setTimeout(tick, 100);
+    };
+    tick();
   });
 }
 
-export function piCreatePayment(
+export async function isPiBrowser(): Promise<boolean> {
+  const sdk = await waitForPiSDK();
+  return sdk !== null;
+}
+
+export function isPiBrowserSync(): boolean {
+  return typeof window !== "undefined" && typeof window.Pi !== "undefined";
+}
+
+let initPromise: Promise<void> | null = null;
+export function initPi(): Promise<void> {
+  if (initPromise) return initPromise;
+  initPromise = (async () => {
+    const sdk = await waitForPiSDK();
+    if (!sdk) throw new Error("Pi SDK not available. Open UDO Farm inside the Pi Browser.");
+    const sandbox = (import.meta.env.VITE_PI_SANDBOX ?? "true") !== "false";
+    // Pi.init returns a Promise in newer SDK versions — await either way.
+    await Promise.resolve(sdk.init({ version: "2.0", sandbox }));
+  })();
+  return initPromise;
+}
+
+export async function piAuthenticate(): Promise<PiAuthResult> {
+  await initPi();
+  return window.Pi!.authenticate(["username"], () => {
+    // Incomplete payment recovery is handled server-side when relevant.
+  });
+}
+
+export async function piCreatePayment(
   data: PiPaymentData,
   callbacks: PiPaymentCallbacks,
 ) {
-  initPi();
-  if (!isPiBrowser()) {
-    throw new Error("Pi Browser required to complete Pi Payments.");
-  }
+  await initPi();
   window.Pi!.createPayment(data, callbacks);
 }
