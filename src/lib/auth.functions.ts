@@ -32,14 +32,15 @@ export const signInWithPi = createServerFn({ method: "POST" })
     let piUserId: string;
     let piUsername: string;
 
-    const piApiKey = process.env.PI_API_KEY;
-
-    if (data.piAccessToken && piApiKey) {
+    if (data.piAccessToken) {
+      // Validate the Pi access token by calling /v2/me. Per Pi docs, this
+      // endpoint accepts the user's access token as a Bearer token — no
+      // server-side Pi API key required for identity verification.
       const res = await fetch("https://api.minepi.com/v2/me", {
         headers: { Authorization: `Bearer ${data.piAccessToken}` },
       });
       if (!res.ok) {
-        throw new Error("Pi token verification failed");
+        throw new Error(`Pi token verification failed (${res.status})`);
       }
       const body = (await res.json()) as { uid: string; username: string };
       piUserId = body.uid;
