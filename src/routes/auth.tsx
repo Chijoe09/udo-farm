@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Sprout, ShoppingBasket, Info } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
@@ -10,7 +10,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { isPiBrowser, piAuthenticate } from "@/lib/pi";
+import { isPiBrowserSync, piAuthenticate } from "@/lib/pi";
 import { signInWithPi } from "@/lib/auth.functions";
 import { z } from "zod";
 
@@ -39,7 +39,21 @@ function AuthPage() {
   const [inPi, setInPi] = useState(false);
 
   useEffect(() => {
-    setInPi(isPiBrowser());
+    // Poll briefly for the async Pi SDK script to attach window.Pi.
+    let cancelled = false;
+    const start = Date.now();
+    const tick = () => {
+      if (cancelled) return;
+      if (isPiBrowserSync()) {
+        setInPi(true);
+        return;
+      }
+      if (Date.now() - start < 4000) setTimeout(tick, 150);
+    };
+    tick();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Redirect authenticated users
@@ -48,6 +62,15 @@ function AuthPage() {
       if (data.session) navigate({ to: "/", replace: true });
     });
   }, [navigate]);
+
+  // Auto-trigger Pi authentication as soon as the SDK is available.
+  const autoTriedRef = useRef(false);
+  useEffect(() => {
+    if (!inPi || autoTriedRef.current) return;
+    autoTriedRef.current = true;
+    void handlePiAuth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inPi]);
 
   async function handlePiAuth() {
     setLoading(true);
