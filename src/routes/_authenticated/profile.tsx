@@ -23,20 +23,16 @@ function ProfilePage() {
 
   useEffect(() => {
     if (!userId) return;
-    supabase
-      .from("profiles")
-      .select("phone,email,location,bio")
-      .eq("id", userId)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (data) setForm({
-          phone: data.phone ?? "",
-          email: data.email ?? "",
-          location: data.location ?? "",
-          bio: data.bio ?? "",
-        });
-        setLoading(false);
+    supabase.rpc("get_my_profile").then(({ data }) => {
+      const row = Array.isArray(data) ? data[0] : data;
+      if (row) setForm({
+        phone: row.phone ?? "",
+        email: row.email ?? "",
+        location: row.location ?? "",
+        bio: row.bio ?? "",
       });
+      setLoading(false);
+    });
   }, [userId]);
 
   async function save() {
