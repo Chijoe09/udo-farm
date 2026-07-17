@@ -48,15 +48,18 @@ export const Route = createFileRoute("/api/public/pi/complete")({
             .eq("id", orderId)
             .maybeSingle();
 
+          if (!order?.buyer_id) {
+            return new Response("Order not found", { status: 404 });
+          }
           await supabaseAdmin.from("payments").upsert(
             {
               pi_payment_id: paymentId,
               txid,
               order_id: orderId,
-              user_id: order?.buyer_id ?? null,
-              amount: piPayment.amount ?? null,
+              user_id: order.buyer_id,
+              amount: piPayment.amount ?? 0,
               memo: piPayment.memo ?? null,
-              metadata: piPayment.metadata ?? {},
+              metadata: (piPayment.metadata ?? {}) as never,
               status: "COMPLETED",
             },
             { onConflict: "pi_payment_id" },

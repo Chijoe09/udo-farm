@@ -25,6 +25,8 @@ import { Route as AuthenticatedOrdersRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedSellerNewRouteImport } from './routes/_authenticated/seller.new'
 import { Route as AuthenticatedCheckoutProductIdRouteImport } from './routes/_authenticated/checkout.$productId'
+import { Route as ApiPublicPiCompleteRouteImport } from './routes/api/public/pi.complete'
+import { Route as ApiPublicPiApproveRouteImport } from './routes/api/public/pi.approve'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -106,6 +108,16 @@ const AuthenticatedCheckoutProductIdRoute =
     path: '/checkout/$productId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicPiCompleteRoute = ApiPublicPiCompleteRouteImport.update({
+  id: '/api/public/pi/complete',
+  path: '/api/public/pi/complete',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicPiApproveRoute = ApiPublicPiApproveRouteImport.update({
+  id: '/api/public/pi/approve',
+  path: '/api/public/pi/approve',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -123,6 +135,8 @@ export interface FileRoutesByFullPath {
   '/seller/$username': typeof SellerUsernameRoute
   '/checkout/$productId': typeof AuthenticatedCheckoutProductIdRoute
   '/seller/new': typeof AuthenticatedSellerNewRoute
+  '/api/public/pi/approve': typeof ApiPublicPiApproveRoute
+  '/api/public/pi/complete': typeof ApiPublicPiCompleteRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -140,6 +154,8 @@ export interface FileRoutesByTo {
   '/seller/$username': typeof SellerUsernameRoute
   '/checkout/$productId': typeof AuthenticatedCheckoutProductIdRoute
   '/seller/new': typeof AuthenticatedSellerNewRoute
+  '/api/public/pi/approve': typeof ApiPublicPiApproveRoute
+  '/api/public/pi/complete': typeof ApiPublicPiCompleteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -159,6 +175,8 @@ export interface FileRoutesById {
   '/seller/$username': typeof SellerUsernameRoute
   '/_authenticated/checkout/$productId': typeof AuthenticatedCheckoutProductIdRoute
   '/_authenticated/seller/new': typeof AuthenticatedSellerNewRoute
+  '/api/public/pi/approve': typeof ApiPublicPiApproveRoute
+  '/api/public/pi/complete': typeof ApiPublicPiCompleteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -178,6 +196,8 @@ export interface FileRouteTypes {
     | '/seller/$username'
     | '/checkout/$productId'
     | '/seller/new'
+    | '/api/public/pi/approve'
+    | '/api/public/pi/complete'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -195,6 +215,8 @@ export interface FileRouteTypes {
     | '/seller/$username'
     | '/checkout/$productId'
     | '/seller/new'
+    | '/api/public/pi/approve'
+    | '/api/public/pi/complete'
   id:
     | '__root__'
     | '/'
@@ -213,6 +235,8 @@ export interface FileRouteTypes {
     | '/seller/$username'
     | '/_authenticated/checkout/$productId'
     | '/_authenticated/seller/new'
+    | '/api/public/pi/approve'
+    | '/api/public/pi/complete'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -226,6 +250,8 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   ProductIdRoute: typeof ProductIdRoute
   SellerUsernameRoute: typeof SellerUsernameRoute
+  ApiPublicPiApproveRoute: typeof ApiPublicPiApproveRoute
+  ApiPublicPiCompleteRoute: typeof ApiPublicPiCompleteRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -342,6 +368,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCheckoutProductIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/pi/complete': {
+      id: '/api/public/pi/complete'
+      path: '/api/public/pi/complete'
+      fullPath: '/api/public/pi/complete'
+      preLoaderRoute: typeof ApiPublicPiCompleteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/pi/approve': {
+      id: '/api/public/pi/approve'
+      path: '/api/public/pi/approve'
+      fullPath: '/api/public/pi/approve'
+      preLoaderRoute: typeof ApiPublicPiApproveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -386,17 +426,9 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   ProductIdRoute: ProductIdRoute,
   SellerUsernameRoute: SellerUsernameRoute,
+  ApiPublicPiApproveRoute: ApiPublicPiApproveRoute,
+  ApiPublicPiCompleteRoute: ApiPublicPiCompleteRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

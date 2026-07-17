@@ -25,22 +25,8 @@ export const Route = createFileRoute("/api/public/pi/approve")({
           return new Response(`Pi approve failed: ${text}`, { status: 502 });
         }
 
-        if (orderId) {
-          const { supabaseAdmin } = await import(
-            "@/integrations/supabase/client.server"
-          );
-          await supabaseAdmin
-            .from("payments")
-            .upsert(
-              {
-                pi_payment_id: paymentId,
-                order_id: orderId,
-                status: "APPROVED",
-              },
-              { onConflict: "pi_payment_id" },
-            );
-        }
-
+        // Payment row is inserted on completion; approve just OKs with Pi.
+        void orderId;
         return Response.json({ ok: true });
       },
     },
