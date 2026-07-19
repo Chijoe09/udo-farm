@@ -238,11 +238,11 @@ function Checkout() {
           </div>
 
           <div className="space-y-2 border-t border-border bg-muted/20 p-5 text-sm">
-            <Row label={`${quantity} × ${p.title}`} value={`${subtotal.toFixed(2)} π`} />
-            <Row label="Delivery" value={`${deliveryFee.toFixed(2)} π`} />
+            <Row label={`${quantity} × ${p.title}`} value={`${fmtPi(subtotal)} π`} />
+            <Row label="Delivery" value={`${fmtPi(deliveryFee)} π`} />
             <div className="flex justify-between border-t border-border pt-2 font-display text-lg font-bold">
               <span>Total</span>
-              <span>{total.toFixed(2)} π</span>
+              <span>{fmtPi(total)} π</span>
             </div>
           </div>
 
@@ -254,7 +254,7 @@ function Checkout() {
               className="h-14 w-full gradient-brand text-base font-semibold text-primary-foreground"
             >
               <ShieldCheck className="mr-2 h-5 w-5" />
-              {processing ? "Processing..." : `Pay ${total.toFixed(2)} π with Pi`}
+              {processing ? "Processing..." : `Pay ${fmtPi(total)} π with Pi`}
             </Button>
             <p className="mt-3 text-center text-xs text-muted-foreground">
               Payments are verified server-side against the Pi Network.
@@ -274,3 +274,12 @@ function Row({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
+function fmtPi(n: number) {
+  if (!isFinite(n)) return "0";
+  if (n === 0) return "0";
+  // Show up to 7 decimals, strip trailing zeros; ensure tiny amounts aren't rounded to 0.00
+  const s = n.toFixed(7).replace(/\.?0+$/, "");
+  return s || "0";
+}
+
