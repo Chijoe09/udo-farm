@@ -62,6 +62,8 @@ export function isPiBrowserSync(): boolean {
   return typeof window !== "undefined" && typeof window.Pi !== "undefined";
 }
 
+export const PI_SCOPES = ["username", "payments", "wallet_address"];
+
 let initPromise: Promise<void> | null = null;
 export function initPi(): Promise<void> {
   if (initPromise) return initPromise;
@@ -69,15 +71,16 @@ export function initPi(): Promise<void> {
     const sdk = await waitForPiSDK();
     if (!sdk) throw new Error("Pi SDK not available. Open UDO Farm inside the Pi Browser.");
     const sandbox = (import.meta.env.VITE_PI_SANDBOX ?? "true") !== "false";
-    // Pi.init returns a Promise in newer SDK versions — await either way.
-    await Promise.resolve(sdk.init({ version: "2.0", sandbox }));
+    await Promise.resolve(
+      sdk.init({ version: "2.0", sandbox, scope: PI_SCOPES } as unknown as { version: string; sandbox: boolean }),
+    );
   })();
   return initPromise;
 }
 
 export async function piAuthenticate(): Promise<PiAuthResult> {
   await initPi();
-  return window.Pi!.authenticate(["username"], () => {
+  return window.Pi!.authenticate(PI_SCOPES, () => {
     // Incomplete payment recovery is handled server-side when relevant.
   });
 }

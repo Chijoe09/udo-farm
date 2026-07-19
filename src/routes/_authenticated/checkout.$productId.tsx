@@ -57,9 +57,10 @@ function Checkout() {
   }
 
   const p = product;
-  const subtotal = Number(p.price_per_unit) * quantity;
+  const unitPrice = Number(p.price_per_unit) || 0;
+  const subtotal = unitPrice * quantity;
   const deliveryFee = deliveryType === "DELIVERY" ? DELIVERY_FEE : 0;
-  const total = subtotal + deliveryFee;
+  const total = Number((subtotal + deliveryFee).toFixed(7));
 
   async function pay() {
     if (!userId) return;
