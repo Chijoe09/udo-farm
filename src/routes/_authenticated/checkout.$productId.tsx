@@ -254,7 +254,7 @@ function Checkout() {
               className="h-14 w-full gradient-brand text-base font-semibold text-primary-foreground"
             >
               <ShieldCheck className="mr-2 h-5 w-5" />
-              {processing ? "Processing..." : `Pay ${total.toFixed(2)} π with Pi`}
+              {processing ? "Processing..." : `Pay ${fmtPi(total)} π with Pi`}
             </Button>
             <p className="mt-3 text-center text-xs text-muted-foreground">
               Payments are verified server-side against the Pi Network.
