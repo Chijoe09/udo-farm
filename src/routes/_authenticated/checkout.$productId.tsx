@@ -238,11 +238,11 @@ function Checkout() {
           </div>
 
           <div className="space-y-2 border-t border-border bg-muted/20 p-5 text-sm">
-            <Row label={`${quantity} × ${p.title}`} value={`${subtotal.toFixed(2)} π`} />
-            <Row label="Delivery" value={`${deliveryFee.toFixed(2)} π`} />
+            <Row label={`${quantity} × ${p.title}`} value={`${fmtPi(subtotal)} π`} />
+            <Row label="Delivery" value={`${fmtPi(deliveryFee)} π`} />
             <div className="flex justify-between border-t border-border pt-2 font-display text-lg font-bold">
               <span>Total</span>
-              <span>{total.toFixed(2)} π</span>
+              <span>{fmtPi(total)} π</span>
             </div>
           </div>
 
