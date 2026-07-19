@@ -274,3 +274,12 @@ function Row({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
+function fmtPi(n: number) {
+  if (!isFinite(n)) return "0";
+  if (n === 0) return "0";
+  // Show up to 7 decimals, strip trailing zeros; ensure tiny amounts aren't rounded to 0.00
+  const s = n.toFixed(7).replace(/\.?0+$/, "");
+  return s || "0";
+}
+
