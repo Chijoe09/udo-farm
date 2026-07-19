@@ -312,6 +312,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_my_profile: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          bio: string
+          email: string
+          id: string
+          location: string
+          phone: string
+          pi_username: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
