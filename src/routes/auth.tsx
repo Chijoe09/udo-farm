@@ -87,8 +87,10 @@ function AuthPage() {
           mockUsername: !inPi ? mockUsername.trim() : undefined,
         },
       });
+      // Supabase verifyOtp with token_hash must ONLY receive token_hash + type.
+      // Passing extra fields (email, state, etc.) triggers:
+      // "Only the token_hash and type should be provided"
       const { error } = await supabase.auth.verifyOtp({
-        email: result.email,
         token_hash: result.hashed_token,
         type: "magiclink",
       });
