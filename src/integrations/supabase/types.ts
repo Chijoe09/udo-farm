@@ -312,6 +312,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      complete_pi_order: {
+        Args: {
+          p_amount: number
+          p_memo: string
+          p_metadata: Json
+          p_order_id: string
+          p_pi_payment_id: string
+          p_txid: string
+        }
+        Returns: undefined
+      }
       get_my_profile: {
         Args: never
         Returns: {
