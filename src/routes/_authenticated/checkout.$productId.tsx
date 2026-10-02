@@ -11,7 +11,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/use-session";
 import { toast } from "sonner";
-import { isPiBrowserSync, piCreatePayment } from "@/lib/pi";
+import { piCreatePayment } from "@/lib/pi";
 import { Truck, MapPin, ShieldCheck, Info } from "lucide-react";
 import { z } from "zod";
 
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_authenticated/checkout/$productId")({
   component: Checkout,
 });
 
-const DELIVERY_FEE = 5; // π flat
+const DELIVERY_FEE = 0;
 
 function Checkout() {
   const { productId } = Route.useParams();
@@ -64,6 +64,10 @@ function Checkout() {
 
   async function pay() {
     if (!userId) return;
+    if (!Number.isFinite(unitPrice) || unitPrice < 0.001 || unitPrice > 0.1) {
+      toast.error("Price must be 0.001 to 0.1 Pi per Pi policy");
+      return;
+    }
     if (quantity > Number(p.live_inventory)) {
       toast.error(`Only ${p.live_inventory} ${p.unit}s available`);
       return;
@@ -93,63 +97,41 @@ function Checkout() {
         .single();
       if (orderErr || !order) throw orderErr ?? new Error("Order failed");
 
-      // 2. Create Pi payment (real or mock)
-      if (isPiBrowserSync()) {
-        await piCreatePayment(
-          {
-            amount: total,
-            memo: `UDO Farm order · ${p.title}`,
-            metadata: { orderId: order.id, productId: p.id },
-          },
-          {
-            onReadyForServerApproval: async (paymentId) => {
-              await fetch("/api/public/pi/approve", {
-                method: "POST",
-                headers: { "content-type": "application/json" },
-                body: JSON.stringify({ paymentId, orderId: order.id }),
-              });
-            },
-            onReadyForServerCompletion: async (paymentId, txid) => {
-              await fetch("/api/public/pi/complete", {
-                method: "POST",
-                headers: { "content-type": "application/json" },
-                body: JSON.stringify({ paymentId, txid, orderId: order.id }),
-              });
-              toast.success("Payment complete!");
-              navigate({ to: "/orders" });
-            },
-            onCancel: () => {
-              toast.error("Payment cancelled");
-              setProcessing(false);
-            },
-            onError: (err) => {
-              toast.error(err.message);
-              setProcessing(false);
-            },
-          },
-        );
-      } else {
-        // Mock payment flow
-        const mockPaymentId = `mock_${crypto.randomUUID()}`;
-        const mockTxid = `mocktx_${crypto.randomUUID().slice(0, 8)}`;
-        await supabase.from("payments").insert({
-          pi_payment_id: mockPaymentId,
-          txid: mockTxid,
+      await piCreatePayment(
+        {
           amount: total,
-          status: "COMPLETED",
-          order_id: order.id,
-          user_id: userId,
-          memo: `Mock payment · ${p.title}`,
-          metadata: { mock: true, orderId: order.id },
-        });
-        await supabase.from("orders").update({ status: "PAID" }).eq("id", order.id);
-        await supabase
-          .from("products")
-          .update({ live_inventory: Number(p.live_inventory) - quantity })
-          .eq("id", p.id);
-        toast.success("Mock payment complete! (Pi Browser required for real Pi payments)");
-        navigate({ to: "/orders" });
-      }
+          memo: `UDO Farm: ${p.title}`,
+          metadata: { orderId: order.id, productId: p.id },
+        },
+        {
+          onReadyForServerApproval: async (paymentId) => {
+            const response = await fetch("/api/public/pi/approve", {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({ paymentId, orderId: order.id }),
+            });
+            if (!response.ok) throw new Error(await response.text());
+          },
+          onReadyForServerCompletion: async (paymentId, txid) => {
+            const response = await fetch("/api/public/pi/complete", {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({ paymentId, txid, orderId: order.id }),
+            });
+            if (!response.ok) throw new Error(await response.text());
+            toast.success("Payment complete!");
+            navigate({ to: "/orders" });
+          },
+          onCancel: () => {
+            toast.error("Payment cancelled");
+            setProcessing(false);
+          },
+          onError: (err) => {
+            toast.error(`Payment error: ${err.message}`);
+            setProcessing(false);
+          },
+        },
+      );
     } catch (err) {
       console.error(err);
       toast.error(err instanceof Error ? err.message : "Payment failed");

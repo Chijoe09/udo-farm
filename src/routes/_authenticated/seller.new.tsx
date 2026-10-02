@@ -30,7 +30,7 @@ const schema = z.object({
   category: z.string().min(1),
   quantity: z.coerce.number().positive(),
   unit: z.string().min(1),
-  pricePerUnit: z.coerce.number().positive(),
+  pricePerUnit: z.coerce.number().min(0.001, "Price must be 0.001 to 0.1 Pi per Pi policy").max(0.1, "Price must be 0.001 to 0.1 Pi per Pi policy"),
   location: z.string().trim().max(120).optional(),
   harvestDate: z.string().optional(),
 });
@@ -72,7 +72,7 @@ function NewListing() {
     const fd = new FormData(e.currentTarget);
     const parsed = schema.safeParse(Object.fromEntries(fd));
     if (!parsed.success) {
-      toast.error(parsed.error.issues[0].message);
+      toast.error(parsed.error.issues[0]?.message ?? "Please check the listing details");
       return;
     }
     setSubmitting(true);
@@ -170,7 +170,8 @@ function NewListing() {
               </div>
               <div>
                 <Label htmlFor="pricePerUnit">Price per unit (π) *</Label>
-                <Input id="pricePerUnit" name="pricePerUnit" type="number" min={0.01} step="0.01" required />
+                <Input id="pricePerUnit" name="pricePerUnit" type="number" min={0.001} max={0.1} step="0.001" required />
+                <p className="mt-1 text-xs text-muted-foreground">Price must be 0.001 to 0.1 Pi per Pi policy.</p>
               </div>
               <div>
                 <Label htmlFor="harvestDate">Harvest date</Label>
