@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1790908553599,
+      "tag": "0000_pi_payment_price_and_atomic_completion",
+      "breakpoints": true
+    }
+  ]
+}
