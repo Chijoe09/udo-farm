@@ -78,8 +78,8 @@ export const Route = createFileRoute("/api/public/pi/complete")({
           p_pi_payment_id: paymentId,
           p_txid: txid,
           p_amount: piPayment.amount ?? expectedAmount,
-          p_memo: piPayment.memo ?? null,
-          p_metadata: piPayment.metadata ?? null,
+          p_memo: piPayment.memo ?? "",
+          p_metadata: (piPayment.metadata ?? {}) as import("@/integrations/supabase/types").Json,
         });
         if (completionError) return new Response("Payment completed, but order recording failed", { status: 500 });
 
