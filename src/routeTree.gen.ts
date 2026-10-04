@@ -17,6 +17,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SigninCallbackRouteImport } from './routes/signin.callback'
 import { Route as SellerUsernameRouteImport } from './routes/seller.$username'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
 import { Route as AuthenticatedSellerRouteImport } from './routes/_authenticated/seller'
@@ -65,6 +66,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SigninCallbackRoute = SigninCallbackRouteImport.update({
+  id: '/signin/callback',
+  path: '/signin/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SellerUsernameRoute = SellerUsernameRouteImport.update({
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/seller': typeof AuthenticatedSellerRouteWithChildren
   '/product/$id': typeof ProductIdRoute
   '/seller/$username': typeof SellerUsernameRoute
+  '/signin/callback': typeof SigninCallbackRoute
   '/checkout/$productId': typeof AuthenticatedCheckoutProductIdRoute
   '/seller/new': typeof AuthenticatedSellerNewRoute
   '/api/public/pi/approve': typeof ApiPublicPiApproveRoute
@@ -152,6 +159,7 @@ export interface FileRoutesByTo {
   '/seller': typeof AuthenticatedSellerRouteWithChildren
   '/product/$id': typeof ProductIdRoute
   '/seller/$username': typeof SellerUsernameRoute
+  '/signin/callback': typeof SigninCallbackRoute
   '/checkout/$productId': typeof AuthenticatedCheckoutProductIdRoute
   '/seller/new': typeof AuthenticatedSellerNewRoute
   '/api/public/pi/approve': typeof ApiPublicPiApproveRoute
@@ -173,6 +181,7 @@ export interface FileRoutesById {
   '/_authenticated/seller': typeof AuthenticatedSellerRouteWithChildren
   '/product/$id': typeof ProductIdRoute
   '/seller/$username': typeof SellerUsernameRoute
+  '/signin/callback': typeof SigninCallbackRoute
   '/_authenticated/checkout/$productId': typeof AuthenticatedCheckoutProductIdRoute
   '/_authenticated/seller/new': typeof AuthenticatedSellerNewRoute
   '/api/public/pi/approve': typeof ApiPublicPiApproveRoute
@@ -194,6 +203,7 @@ export interface FileRouteTypes {
     | '/seller'
     | '/product/$id'
     | '/seller/$username'
+    | '/signin/callback'
     | '/checkout/$productId'
     | '/seller/new'
     | '/api/public/pi/approve'
@@ -213,6 +223,7 @@ export interface FileRouteTypes {
     | '/seller'
     | '/product/$id'
     | '/seller/$username'
+    | '/signin/callback'
     | '/checkout/$productId'
     | '/seller/new'
     | '/api/public/pi/approve'
@@ -233,6 +244,7 @@ export interface FileRouteTypes {
     | '/_authenticated/seller'
     | '/product/$id'
     | '/seller/$username'
+    | '/signin/callback'
     | '/_authenticated/checkout/$productId'
     | '/_authenticated/seller/new'
     | '/api/public/pi/approve'
@@ -250,6 +262,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   ProductIdRoute: typeof ProductIdRoute
   SellerUsernameRoute: typeof SellerUsernameRoute
+  SigninCallbackRoute: typeof SigninCallbackRoute
   ApiPublicPiApproveRoute: typeof ApiPublicPiApproveRoute
   ApiPublicPiCompleteRoute: typeof ApiPublicPiCompleteRoute
 }
@@ -310,6 +323,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signin/callback': {
+      id: '/signin/callback'
+      path: '/signin/callback'
+      fullPath: '/signin/callback'
+      preLoaderRoute: typeof SigninCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/seller/$username': {
@@ -426,6 +446,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   ProductIdRoute: ProductIdRoute,
   SellerUsernameRoute: SellerUsernameRoute,
+  SigninCallbackRoute: SigninCallbackRoute,
   ApiPublicPiApproveRoute: ApiPublicPiApproveRoute,
   ApiPublicPiCompleteRoute: ApiPublicPiCompleteRoute,
 }

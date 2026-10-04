@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/use-session";
 import { toast } from "sonner";
 import { piCreatePayment } from "@/lib/pi";
-import { Truck, MapPin, ShieldCheck, Info } from "lucide-react";
+import { Truck, MapPin, ShieldCheck } from "lucide-react";
 import { z } from "zod";
 
 const searchSchema = z.object({ apply: z.boolean().optional() });
@@ -144,15 +144,6 @@ function Checkout() {
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
         <h1 className="font-display text-3xl font-bold">Checkout</h1>
         <p className="mt-1 text-muted-foreground">Review and pay with Pi.</p>
-
-        {!isPiBrowserSync() && (
-          <div className="mt-4 flex items-start gap-2 rounded-xl bg-warning/10 p-3 text-sm">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
-            <p className="text-warning-foreground/90">
-              You're not in the Pi Browser. Payment will be simulated (dev mode). Open in Pi Browser for real Pi Payments.
-            </p>
-          </div>
-        )}
 
         <Card className="mt-6 overflow-hidden">
           <div className="flex gap-4 border-b border-border bg-muted/30 p-4">
