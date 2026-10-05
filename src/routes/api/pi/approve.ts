@@ -1,16 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { handlePiApprove } from "../public/pi.approve";
 
 export const Route = createFileRoute("/api/pi/approve")({
   server: {
     handlers: {
-      POST: async ({ request }) => {
-        const response = await fetch(new URL("/api/public/pi/approve", request.url), {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: await request.text(),
-        });
-        return response;
-      },
+      POST: ({ request }) => handlePiApprove(request),
     },
   },
 });
