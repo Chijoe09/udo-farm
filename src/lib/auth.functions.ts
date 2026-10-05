@@ -2,10 +2,10 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 /**
- * Sign in with Pi. In production, the client passes the Pi access token
- * obtained from Pi.authenticate(); the server verifies it against the Pi
- * Platform API (/v2/me) using PI_API_KEY. In dev / outside Pi Browser,
- * we accept a username and mint a synthetic user.
+ * Sign in with Pi. The client passes the Pi access token obtained from
+ * Pi.authenticate(); the server verifies it against the Pi Platform API
+ * (/v2/me). Only a verified Pi identity can create a session — there is no
+ * username-only or mock sign-in path.
  *
  * Returns a hashed OTP token the client uses to establish a Supabase session:
  *   supabase.auth.verifyOtp({ email, token_hash, type: 'magiclink' })
@@ -14,14 +14,7 @@ export const signInWithPi = createServerFn({ method: "POST" })
   .inputValidator((input) =>
     z
       .object({
-        piAccessToken: z.string().optional(),
-        mockUsername: z
-          .string()
-          .trim()
-          .min(2)
-          .max(40)
-          .regex(/^[a-zA-Z0-9_.-]+$/)
-          .optional(),
+        piAccessToken: z.string().min(1),
         role: z.enum(["farmer", "buyer"]),
       })
       .parse(input),
@@ -29,29 +22,18 @@ export const signInWithPi = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    let piUserId: string;
-    let piUsername: string;
-
-    if (data.piAccessToken) {
-      // Validate the Pi access token by calling /v2/me. Per Pi docs, this
-      // endpoint accepts the user's access token as a Bearer token — no
-      // server-side Pi API key required for identity verification.
-      const res = await fetch("https://api.minepi.com/v2/me", {
-        headers: { Authorization: `Bearer ${data.piAccessToken}` },
-      });
-      if (!res.ok) {
-        throw new Error(`Pi token verification failed (${res.status})`);
-      }
-      const body = (await res.json()) as { uid: string; username: string };
-      piUserId = body.uid;
-      piUsername = body.username;
-    } else if (data.mockUsername) {
-      // Dev / non-Pi-Browser mode.
-      piUsername = data.mockUsername;
-      piUserId = `mock_${data.mockUsername.toLowerCase()}`;
-    } else {
-      throw new Error("Provide a Pi access token or a mock username.");
+    // Validate the Pi access token by calling /v2/me. Per Pi docs, this
+    // endpoint accepts the user's access token as a Bearer token — no
+    // server-side Pi API key required for identity verification.
+    const res = await fetch("https://api.minepi.com/v2/me", {
+      headers: { Authorization: `Bearer ${data.piAccessToken}` },
+    });
+    if (!res.ok) {
+      throw new Error(`Pi token verification failed (${res.status})`);
     }
+    const body = (await res.json()) as { uid: string; username: string };
+    const piUserId = body.uid;
+    const piUsername = body.username;
 
     const email = `pi_${piUserId}@udofarm.pi`;
 
