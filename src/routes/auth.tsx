@@ -90,13 +90,12 @@ function AuthPage() {
       // Supabase verifyOtp with token_hash must ONLY receive token_hash + type.
       // Passing extra fields (email, state, etc.) triggers:
       // "Only the token_hash and type should be provided"
-      const { error } = await supabase.auth.verifyOtp({
-        token_hash: result.hashed_token,
-        type: "magiclink",
-      });
-      if (error) throw error;
       toast.success(`Welcome, @${result.piUsername}`);
-      navigate({ to: role === "farmer" ? "/seller" : "/marketplace", replace: true });
+      navigate({
+        to: "/signin/callback",
+        search: { token_hash: result.hashed_token, type: "magiclink" },
+        replace: true,
+      });
     } catch (err) {
       console.error(err);
       toast.error(err instanceof Error ? err.message : "Sign-in failed");

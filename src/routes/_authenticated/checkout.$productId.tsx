@@ -105,7 +105,7 @@ function Checkout() {
         },
         {
           onReadyForServerApproval: async (paymentId) => {
-            const response = await fetch("/api/public/pi/approve", {
+            const response = await fetch("/api/pi/approve", {
               method: "POST",
               headers: { "content-type": "application/json" },
               body: JSON.stringify({ paymentId, orderId: order.id }),
@@ -113,7 +113,7 @@ function Checkout() {
             if (!response.ok) throw new Error(await response.text());
           },
           onReadyForServerCompletion: async (paymentId, txid) => {
-            const response = await fetch("/api/public/pi/complete", {
+            const response = await fetch("/api/pi/complete", {
               method: "POST",
               headers: { "content-type": "application/json" },
               body: JSON.stringify({ paymentId, txid, orderId: order.id }),
