@@ -8,6 +8,20 @@
       "when": 1790908553599,
       "tag": "0000_pi_payment_price_and_atomic_completion",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791170672908,
+      "tag": "0001_restrict_order_paid_and_profile_rating_updates",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791170683976,
+      "tag": "0002_refine_paid_status_trigger_service_role",
+      "breakpoints": true
     }
   ]
 }
