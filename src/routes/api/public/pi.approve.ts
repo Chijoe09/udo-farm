@@ -40,37 +40,39 @@ async function verifyPiPayment(paymentId: string, orderId: string, apiKey: strin
   if (payment.metadata?.orderId !== orderId) throw new Error("Payment metadata does not match order");
 }
 
+export async function handlePiApprove(request: Request): Promise<Response> {
+  const apiKey = process.env.PI_API_KEY;
+  if (!apiKey) return new Response("PI_API_KEY not configured", { status: 500 });
+  const walletAddress = process.env.PI_WALLET_ADDRESS;
+  if (!walletAddress) return new Response("PI_WALLET_ADDRESS not configured", { status: 500 });
+  const parsed = requestSchema.safeParse(await request.json().catch(() => null));
+  if (!parsed.success) return new Response("Invalid payment request", { status: 400 });
+  const { paymentId, orderId } = parsed.data;
+  try {
+    await verifyPiPayment(paymentId, orderId, apiKey, walletAddress);
+  } catch (error) {
+    return new Response(error instanceof Error ? error.message : "Payment verification failed", { status: 400 });
+  }
+
+  const res = await fetch(
+    `https://api.minepi.com/v2/payments/${paymentId}/approve`,
+    {
+      method: "POST",
+      headers: { Authorization: `Key ${apiKey}` },
+    },
+  );
+  if (!res.ok) {
+    const text = await res.text();
+    return new Response(`Pi approve failed: ${text}`, { status: 502 });
+  }
+
+  return Response.json({ ok: true });
+}
+
 export const Route = createFileRoute("/api/public/pi/approve")({
   server: {
     handlers: {
-      POST: async ({ request }) => {
-        const apiKey = process.env.PI_API_KEY;
-        if (!apiKey) return new Response("PI_API_KEY not configured", { status: 500 });
-        const walletAddress = process.env.PI_WALLET_ADDRESS;
-        if (!walletAddress) return new Response("PI_WALLET_ADDRESS not configured", { status: 500 });
-        const parsed = requestSchema.safeParse(await request.json().catch(() => null));
-        if (!parsed.success) return new Response("Invalid payment request", { status: 400 });
-        const { paymentId, orderId } = parsed.data;
-        try {
-          await verifyPiPayment(paymentId, orderId, apiKey, walletAddress);
-        } catch (error) {
-          return new Response(error instanceof Error ? error.message : "Payment verification failed", { status: 400 });
-        }
-
-        const res = await fetch(
-          `https://api.minepi.com/v2/payments/${paymentId}/approve`,
-          {
-            method: "POST",
-            headers: { Authorization: `Key ${apiKey}` },
-          },
-        );
-        if (!res.ok) {
-          const text = await res.text();
-          return new Response(`Pi approve failed: ${text}`, { status: 502 });
-        }
-
-        return Response.json({ ok: true });
-      },
+      POST: ({ request }) => handlePiApprove(request),
     },
   },
 });
