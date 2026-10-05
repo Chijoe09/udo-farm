@@ -4,7 +4,6 @@ import { useServerFn } from "@tanstack/react-start";
 import { Sprout, ShoppingBasket, Info } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card } from "@/components/ui/card";
@@ -38,7 +37,6 @@ function AuthPage() {
   const navigate = useNavigate();
   const signIn = useServerFn(signInWithPi);
   const [role, setRole] = useState<"buyer" | "farmer">(search.role ?? "buyer");
-  const [mockUsername, setMockUsername] = useState("");
   const [loading, setLoading] = useState(false);
   const [inPi, setInPi] = useState(false);
 
@@ -77,20 +75,19 @@ function AuthPage() {
   }, [inPi]);
 
   async function handlePiAuth() {
+    if (!inPi) {
+      toast.error("Open UDO Farm in the Pi Browser to sign in with your Pi identity.");
+      return;
+    }
     setLoading(true);
     try {
-      let piAccessToken: string | undefined;
-      if (inPi) {
-        const res = await piAuthenticate(() => {
-          toast.info("An unfinished Pi payment was found. Complete it in your Pi Wallet before starting another payment.");
-        });
-        piAccessToken = res.accessToken;
-      }
+      const res = await piAuthenticate(() => {
+        toast.info("An unfinished Pi payment was found. Complete it in your Pi Wallet before starting another payment.");
+      });
       const result = await signIn({
         data: {
           role,
-          piAccessToken,
-          mockUsername: !inPi ? mockUsername.trim() : undefined,
+          piAccessToken: res.accessToken,
         },
       });
       // Supabase verifyOtp with token_hash must ONLY receive token_hash + type.
@@ -139,31 +136,21 @@ function AuthPage() {
           </RadioGroup>
 
           {!inPi && (
-            <div className="mt-5 space-y-2">
-              <div className="flex items-start gap-2 rounded-xl bg-warning/10 p-3 text-xs text-warning-foreground/90">
-                <Info className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
-                <p>
-                  Pi Browser not detected. You're in <strong>dev mode</strong> — enter a username to explore. In production, open UDO Farm in the Pi Browser to sign in with your real Pi identity.
-                </p>
-              </div>
-              <Label htmlFor="mock" className="text-sm">Pi username (dev mode)</Label>
-              <Input
-                id="mock"
-                value={mockUsername}
-                onChange={(e) => setMockUsername(e.target.value)}
-                placeholder="pioneer_jane"
-                autoComplete="off"
-              />
+            <div className="mt-5 flex items-start gap-2 rounded-xl bg-warning/10 p-3 text-xs text-warning-foreground/90">
+              <Info className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
+              <p>
+                Pi Browser not detected. Open UDO Farm in the <strong>Pi Browser</strong> to sign in securely with your real Pi identity.
+              </p>
             </div>
           )}
 
           <Button
             onClick={handlePiAuth}
-            disabled={loading || (!inPi && mockUsername.trim().length < 2)}
+            disabled={loading || !inPi}
             size="lg"
             className="mt-5 h-12 w-full gradient-brand text-primary-foreground"
           >
-            {loading ? "Signing in..." : inPi ? "Continue with Pi" : "Continue (dev mode)"}
+            {loading ? "Signing in..." : "Continue with Pi"}
           </Button>
 
           <p className="mt-4 text-center text-xs text-muted-foreground">
