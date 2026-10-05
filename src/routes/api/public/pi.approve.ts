@@ -40,10 +40,7 @@ async function verifyPiPayment(paymentId: string, orderId: string, apiKey: strin
   if (payment.metadata?.orderId !== orderId) throw new Error("Payment metadata does not match order");
 }
 
-export const Route = createFileRoute("/api/public/pi/approve")({
-  server: {
-    handlers: {
-      POST: async ({ request }) => {
+export async function handlePiApprove(request: Request): Promise<Response> {
         const apiKey = process.env.PI_API_KEY;
         if (!apiKey) return new Response("PI_API_KEY not configured", { status: 500 });
         const walletAddress = process.env.PI_WALLET_ADDRESS;
