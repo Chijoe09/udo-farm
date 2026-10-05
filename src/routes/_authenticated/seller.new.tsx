@@ -171,7 +171,7 @@ function NewListing() {
               <div>
                 <Label htmlFor="pricePerUnit">Price per unit (π) *</Label>
                 <Input id="pricePerUnit" name="pricePerUnit" type="number" min={0.001} max={0.1} step="0.001" required />
-                <p className="mt-1 text-xs text-muted-foreground">Price must be 0.001 to 0.1 Pi per Pi policy.</p>
+                <p className="mt-1 text-xs text-muted-foreground">Price must be 0.001 to 0.1 Pi per Pi policy</p>
               </div>
               <div>
                 <Label htmlFor="harvestDate">Harvest date</Label>

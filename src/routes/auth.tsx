@@ -77,7 +77,9 @@ function AuthPage() {
     try {
       let piAccessToken: string | undefined;
       if (inPi) {
-        const res = await piAuthenticate();
+        const res = await piAuthenticate(() => {
+          toast.info("An unfinished Pi payment was found. Complete it in your Pi Wallet before starting another payment.");
+        });
         piAccessToken = res.accessToken;
       }
       const result = await signIn({
