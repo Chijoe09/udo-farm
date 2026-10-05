@@ -9,51 +9,35 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TermsRouteImport } from './routes/terms'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as MarketplaceRouteImport } from './routes/marketplace'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AboutRouteImport } from './routes/about'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as SigninCallbackRouteImport } from './routes/signin.callback'
-import { Route as SellerUsernameRouteImport } from './routes/seller.$username'
-import { Route as ProductIdRouteImport } from './routes/product.$id'
-import { Route as AuthenticatedSellerRouteImport } from './routes/_authenticated/seller'
-import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
-import { Route as AuthenticatedOrdersRouteImport } from './routes/_authenticated/orders'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as MarketplaceRouteImport } from './routes/marketplace'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
-import { Route as ApiPiCompleteRouteImport } from './routes/api/pi/complete'
-import { Route as ApiPiApproveRouteImport } from './routes/api/pi/approve'
-import { Route as AuthenticatedSellerNewRouteImport } from './routes/_authenticated/seller.new'
+import { Route as AuthenticatedOrdersRouteImport } from './routes/_authenticated/orders'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedSellerRouteImport } from './routes/_authenticated/seller'
+import { Route as ProductIdRouteImport } from './routes/product.$id'
+import { Route as SellerUsernameRouteImport } from './routes/seller.$username'
+import { Route as SigninCallbackRouteImport } from './routes/signin.callback'
 import { Route as AuthenticatedCheckoutProductIdRouteImport } from './routes/_authenticated/checkout.$productId'
-import { Route as ApiPublicPiCompleteRouteImport } from './routes/api/public/pi.complete'
+import { Route as AuthenticatedSellerNewRouteImport } from './routes/_authenticated/seller.new'
+import { Route as ApiPiApproveRouteImport } from './routes/api/pi/approve'
+import { Route as ApiPiCompleteRouteImport } from './routes/api/pi/complete'
 import { Route as ApiPublicPiApproveRouteImport } from './routes/api/public/pi.approve'
+import { Route as ApiPublicPiCompleteRouteImport } from './routes/api/public/pi.complete'
 
-const TermsRoute = TermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MarketplaceRoute = MarketplaceRouteImport.update({
-  id: '/marketplace',
-  path: '/marketplace',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -61,38 +45,34 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SigninCallbackRoute = SigninCallbackRouteImport.update({
-  id: '/signin/callback',
-  path: '/signin/callback',
+const MarketplaceRoute = MarketplaceRouteImport.update({
+  id: '/marketplace',
+  path: '/marketplace',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SellerUsernameRoute = SellerUsernameRouteImport.update({
-  id: '/seller/$username',
-  path: '/seller/$username',
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProductIdRoute = ProductIdRouteImport.update({
-  id: '/product/$id',
-  path: '/product/$id',
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedSellerRoute = AuthenticatedSellerRouteImport.update({
-  id: '/seller',
-  path: '/seller',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedOrdersRoute = AuthenticatedOrdersRouteImport.update({
@@ -100,25 +80,30 @@ const AuthenticatedOrdersRoute = AuthenticatedOrdersRouteImport.update({
   path: '/orders',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const ApiPiCompleteRoute = ApiPiCompleteRouteImport.update({
-  id: '/api/pi/complete',
-  path: '/api/pi/complete',
+const AuthenticatedSellerRoute = AuthenticatedSellerRouteImport.update({
+  id: '/seller',
+  path: '/seller',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ProductIdRoute = ProductIdRouteImport.update({
+  id: '/product/$id',
+  path: '/product/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPiApproveRoute = ApiPiApproveRouteImport.update({
-  id: '/api/pi/approve',
-  path: '/api/pi/approve',
+const SellerUsernameRoute = SellerUsernameRouteImport.update({
+  id: '/seller/$username',
+  path: '/seller/$username',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedSellerNewRoute = AuthenticatedSellerNewRouteImport.update({
-  id: '/new',
-  path: '/new',
-  getParentRoute: () => AuthenticatedSellerRoute,
+const SigninCallbackRoute = SigninCallbackRouteImport.update({
+  id: '/signin/callback',
+  path: '/signin/callback',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedCheckoutProductIdRoute =
   AuthenticatedCheckoutProductIdRouteImport.update({
@@ -126,14 +111,29 @@ const AuthenticatedCheckoutProductIdRoute =
     path: '/checkout/$productId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const ApiPublicPiCompleteRoute = ApiPublicPiCompleteRouteImport.update({
-  id: '/api/public/pi/complete',
-  path: '/api/public/pi/complete',
+const AuthenticatedSellerNewRoute = AuthenticatedSellerNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AuthenticatedSellerRoute,
+} as any)
+const ApiPiApproveRoute = ApiPiApproveRouteImport.update({
+  id: '/api/pi/approve',
+  path: '/api/pi/approve',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPiCompleteRoute = ApiPiCompleteRouteImport.update({
+  id: '/api/pi/complete',
+  path: '/api/pi/complete',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicPiApproveRoute = ApiPublicPiApproveRouteImport.update({
   id: '/api/public/pi/approve',
   path: '/api/public/pi/approve',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicPiCompleteRoute = ApiPublicPiCompleteRouteImport.update({
+  id: '/api/public/pi/complete',
+  path: '/api/public/pi/complete',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -295,46 +295,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/terms': {
-      id: '/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/marketplace': {
-      id: '/marketplace'
-      path: '/marketplace'
-      fullPath: '/marketplace'
-      preLoaderRoute: typeof MarketplaceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -344,46 +309,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/signin/callback': {
-      id: '/signin/callback'
-      path: '/signin/callback'
-      fullPath: '/signin/callback'
-      preLoaderRoute: typeof SigninCallbackRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/seller/$username': {
-      id: '/seller/$username'
-      path: '/seller/$username'
-      fullPath: '/seller/$username'
-      preLoaderRoute: typeof SellerUsernameRouteImport
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/product/$id': {
-      id: '/product/$id'
-      path: '/product/$id'
-      fullPath: '/product/$id'
-      preLoaderRoute: typeof ProductIdRouteImport
+    '/marketplace': {
+      id: '/marketplace'
+      path: '/marketplace'
+      fullPath: '/marketplace'
+      preLoaderRoute: typeof MarketplaceRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/seller': {
-      id: '/_authenticated/seller'
-      path: '/seller'
-      fullPath: '/seller'
-      preLoaderRoute: typeof AuthenticatedSellerRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/profile': {
-      id: '/_authenticated/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/orders': {
@@ -393,33 +365,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrdersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/admin': {
-      id: '/_authenticated/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/api/pi/complete': {
-      id: '/api/pi/complete'
-      path: '/api/pi/complete'
-      fullPath: '/api/pi/complete'
-      preLoaderRoute: typeof ApiPiCompleteRouteImport
+    '/_authenticated/seller': {
+      id: '/_authenticated/seller'
+      path: '/seller'
+      fullPath: '/seller'
+      preLoaderRoute: typeof AuthenticatedSellerRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/product/$id': {
+      id: '/product/$id'
+      path: '/product/$id'
+      fullPath: '/product/$id'
+      preLoaderRoute: typeof ProductIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/pi/approve': {
-      id: '/api/pi/approve'
-      path: '/api/pi/approve'
-      fullPath: '/api/pi/approve'
-      preLoaderRoute: typeof ApiPiApproveRouteImport
+    '/seller/$username': {
+      id: '/seller/$username'
+      path: '/seller/$username'
+      fullPath: '/seller/$username'
+      preLoaderRoute: typeof SellerUsernameRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/seller/new': {
-      id: '/_authenticated/seller/new'
-      path: '/new'
-      fullPath: '/seller/new'
-      preLoaderRoute: typeof AuthenticatedSellerNewRouteImport
-      parentRoute: typeof AuthenticatedSellerRoute
+    '/signin/callback': {
+      id: '/signin/callback'
+      path: '/signin/callback'
+      fullPath: '/signin/callback'
+      preLoaderRoute: typeof SigninCallbackRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/checkout/$productId': {
       id: '/_authenticated/checkout/$productId'
@@ -428,11 +407,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCheckoutProductIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/api/public/pi/complete': {
-      id: '/api/public/pi/complete'
-      path: '/api/public/pi/complete'
-      fullPath: '/api/public/pi/complete'
-      preLoaderRoute: typeof ApiPublicPiCompleteRouteImport
+    '/_authenticated/seller/new': {
+      id: '/_authenticated/seller/new'
+      path: '/new'
+      fullPath: '/seller/new'
+      preLoaderRoute: typeof AuthenticatedSellerNewRouteImport
+      parentRoute: typeof AuthenticatedSellerRoute
+    }
+    '/api/pi/approve': {
+      id: '/api/pi/approve'
+      path: '/api/pi/approve'
+      fullPath: '/api/pi/approve'
+      preLoaderRoute: typeof ApiPiApproveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/pi/complete': {
+      id: '/api/pi/complete'
+      path: '/api/pi/complete'
+      fullPath: '/api/pi/complete'
+      preLoaderRoute: typeof ApiPiCompleteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/pi/approve': {
@@ -440,6 +433,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/pi/approve'
       fullPath: '/api/public/pi/approve'
       preLoaderRoute: typeof ApiPublicPiApproveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/pi/complete': {
+      id: '/api/public/pi/complete'
+      path: '/api/public/pi/complete'
+      fullPath: '/api/public/pi/complete'
+      preLoaderRoute: typeof ApiPublicPiCompleteRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
