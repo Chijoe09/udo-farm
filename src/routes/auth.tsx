@@ -23,6 +23,10 @@ export const Route = createFileRoute("/auth")({
     meta: [
       { title: "Sign in with Pi — UDO Farm" },
       { name: "description", content: "Sign in to UDO Farm with your Pi Network identity to buy or sell bulk produce." },
+      { property: "og:title", content: "Sign in with Pi — UDO Farm" },
+      { property: "og:description", content: "Sign in to UDO Farm with your Pi Network identity to buy or sell bulk produce." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   validateSearch: searchSchema,

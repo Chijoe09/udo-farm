@@ -5,13 +5,27 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { z } from "zod";
 
-const searchSchema = z.object({
-  token_hash: z.string().optional(),
-  type: z.enum(["signup", "invite", "magiclink", "recovery", "email_change", "email"]).optional(),
-});
+const validOtpTypes = ["signup", "invite", "magiclink", "recovery", "email_change", "email"] as const;
+const searchSchema = z.object({ token_hash: z.string().optional(), type: z.string().optional() });
 
 export const Route = createFileRoute("/signin/callback")({
-  validateSearch: (search) => searchSchema.parse(search),
+  head: () => ({
+    meta: [
+      { title: "Pi sign-in callback — UDO Farm" },
+      { name: "description", content: "Complete secure Pi Network sign-in to UDO Farm." },
+      { property: "og:title", content: "Pi sign-in callback — UDO Farm" },
+      { property: "og:description", content: "Complete secure Pi Network sign-in to UDO Farm." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+  validateSearch: (search) => {
+    const parsed = searchSchema.parse(search);
+    return {
+      token_hash: parsed.token_hash,
+      type: validOtpTypes.find((validType) => validType === parsed.type) ?? "magiclink",
+    };
+  },
   component: SignInCallback,
 });
 
