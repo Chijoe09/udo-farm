@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep Pi payment callbacks on public API routes with server-side verification; thin aliases may expose the requested `/api/pi/*` URLs while forwarding to those protected handlers so Pi callbacks remain reachable without bypassing validation.

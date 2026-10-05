@@ -75,11 +75,11 @@ export function initPi(): Promise<void> {
   return initPromise;
 }
 
-export async function piAuthenticate(): Promise<PiAuthResult> {
+export async function piAuthenticate(
+  onIncompletePaymentFound: (payment: unknown) => void = () => undefined,
+): Promise<PiAuthResult> {
   await initPi();
-  return window.Pi!.authenticate(PI_SCOPES, () => {
-    // The buyer can safely retry checkout; incomplete payments are not auto-completed.
-  });
+  return window.Pi!.authenticate(PI_SCOPES, onIncompletePaymentFound);
 }
 
 export async function piCreatePayment(

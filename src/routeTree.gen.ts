@@ -24,6 +24,8 @@ import { Route as AuthenticatedSellerRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedOrdersRouteImport } from './routes/_authenticated/orders'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as ApiPiCompleteRouteImport } from './routes/api/pi/complete'
+import { Route as ApiPiApproveRouteImport } from './routes/api/pi/approve'
 import { Route as AuthenticatedSellerNewRouteImport } from './routes/_authenticated/seller.new'
 import { Route as AuthenticatedCheckoutProductIdRouteImport } from './routes/_authenticated/checkout.$productId'
 import { Route as ApiPublicPiCompleteRouteImport } from './routes/api/public/pi.complete'
@@ -103,6 +105,16 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPiCompleteRoute = ApiPiCompleteRouteImport.update({
+  id: '/api/pi/complete',
+  path: '/api/pi/complete',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPiApproveRoute = ApiPiApproveRouteImport.update({
+  id: '/api/pi/approve',
+  path: '/api/pi/approve',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedSellerNewRoute = AuthenticatedSellerNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -142,6 +154,8 @@ export interface FileRoutesByFullPath {
   '/signin/callback': typeof SigninCallbackRoute
   '/checkout/$productId': typeof AuthenticatedCheckoutProductIdRoute
   '/seller/new': typeof AuthenticatedSellerNewRoute
+  '/api/pi/approve': typeof ApiPiApproveRoute
+  '/api/pi/complete': typeof ApiPiCompleteRoute
   '/api/public/pi/approve': typeof ApiPublicPiApproveRoute
   '/api/public/pi/complete': typeof ApiPublicPiCompleteRoute
 }
@@ -162,6 +176,8 @@ export interface FileRoutesByTo {
   '/signin/callback': typeof SigninCallbackRoute
   '/checkout/$productId': typeof AuthenticatedCheckoutProductIdRoute
   '/seller/new': typeof AuthenticatedSellerNewRoute
+  '/api/pi/approve': typeof ApiPiApproveRoute
+  '/api/pi/complete': typeof ApiPiCompleteRoute
   '/api/public/pi/approve': typeof ApiPublicPiApproveRoute
   '/api/public/pi/complete': typeof ApiPublicPiCompleteRoute
 }
@@ -184,6 +200,8 @@ export interface FileRoutesById {
   '/signin/callback': typeof SigninCallbackRoute
   '/_authenticated/checkout/$productId': typeof AuthenticatedCheckoutProductIdRoute
   '/_authenticated/seller/new': typeof AuthenticatedSellerNewRoute
+  '/api/pi/approve': typeof ApiPiApproveRoute
+  '/api/pi/complete': typeof ApiPiCompleteRoute
   '/api/public/pi/approve': typeof ApiPublicPiApproveRoute
   '/api/public/pi/complete': typeof ApiPublicPiCompleteRoute
 }
@@ -206,6 +224,8 @@ export interface FileRouteTypes {
     | '/signin/callback'
     | '/checkout/$productId'
     | '/seller/new'
+    | '/api/pi/approve'
+    | '/api/pi/complete'
     | '/api/public/pi/approve'
     | '/api/public/pi/complete'
   fileRoutesByTo: FileRoutesByTo
@@ -226,6 +246,8 @@ export interface FileRouteTypes {
     | '/signin/callback'
     | '/checkout/$productId'
     | '/seller/new'
+    | '/api/pi/approve'
+    | '/api/pi/complete'
     | '/api/public/pi/approve'
     | '/api/public/pi/complete'
   id:
@@ -247,6 +269,8 @@ export interface FileRouteTypes {
     | '/signin/callback'
     | '/_authenticated/checkout/$productId'
     | '/_authenticated/seller/new'
+    | '/api/pi/approve'
+    | '/api/pi/complete'
     | '/api/public/pi/approve'
     | '/api/public/pi/complete'
   fileRoutesById: FileRoutesById
@@ -263,6 +287,8 @@ export interface RootRouteChildren {
   ProductIdRoute: typeof ProductIdRoute
   SellerUsernameRoute: typeof SellerUsernameRoute
   SigninCallbackRoute: typeof SigninCallbackRoute
+  ApiPiApproveRoute: typeof ApiPiApproveRoute
+  ApiPiCompleteRoute: typeof ApiPiCompleteRoute
   ApiPublicPiApproveRoute: typeof ApiPublicPiApproveRoute
   ApiPublicPiCompleteRoute: typeof ApiPublicPiCompleteRoute
 }
@@ -374,6 +400,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/pi/complete': {
+      id: '/api/pi/complete'
+      path: '/api/pi/complete'
+      fullPath: '/api/pi/complete'
+      preLoaderRoute: typeof ApiPiCompleteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/pi/approve': {
+      id: '/api/pi/approve'
+      path: '/api/pi/approve'
+      fullPath: '/api/pi/approve'
+      preLoaderRoute: typeof ApiPiApproveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/seller/new': {
       id: '/_authenticated/seller/new'
       path: '/new'
@@ -447,6 +487,8 @@ const rootRouteChildren: RootRouteChildren = {
   ProductIdRoute: ProductIdRoute,
   SellerUsernameRoute: SellerUsernameRoute,
   SigninCallbackRoute: SigninCallbackRoute,
+  ApiPiApproveRoute: ApiPiApproveRoute,
+  ApiPiCompleteRoute: ApiPiCompleteRoute,
   ApiPublicPiApproveRoute: ApiPublicPiApproveRoute,
   ApiPublicPiCompleteRoute: ApiPublicPiCompleteRoute,
 }

@@ -23,6 +23,10 @@ export const Route = createFileRoute("/auth")({
     meta: [
       { title: "Sign in with Pi — UDO Farm" },
       { name: "description", content: "Sign in to UDO Farm with your Pi Network identity to buy or sell bulk produce." },
+      { property: "og:title", content: "Sign in with Pi — UDO Farm" },
+      { property: "og:description", content: "Sign in to UDO Farm with your Pi Network identity to buy or sell bulk produce." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   validateSearch: searchSchema,
@@ -77,7 +81,9 @@ function AuthPage() {
     try {
       let piAccessToken: string | undefined;
       if (inPi) {
-        const res = await piAuthenticate();
+        const res = await piAuthenticate(() => {
+          toast.info("An unfinished Pi payment was found. Complete it in your Pi Wallet before starting another payment.");
+        });
         piAccessToken = res.accessToken;
       }
       const result = await signIn({
@@ -90,13 +96,12 @@ function AuthPage() {
       // Supabase verifyOtp with token_hash must ONLY receive token_hash + type.
       // Passing extra fields (email, state, etc.) triggers:
       // "Only the token_hash and type should be provided"
-      const { error } = await supabase.auth.verifyOtp({
-        token_hash: result.hashed_token,
-        type: "magiclink",
-      });
-      if (error) throw error;
       toast.success(`Welcome, @${result.piUsername}`);
-      navigate({ to: role === "farmer" ? "/seller" : "/marketplace", replace: true });
+      navigate({
+        to: "/signin/callback",
+        search: { token_hash: result.hashed_token, type: "magiclink" },
+        replace: true,
+      });
     } catch (err) {
       console.error(err);
       toast.error(err instanceof Error ? err.message : "Sign-in failed");
