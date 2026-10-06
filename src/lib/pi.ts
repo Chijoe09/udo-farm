@@ -62,7 +62,7 @@ export function isPiBrowserSync(): boolean {
   return typeof window !== "undefined" && typeof window.Pi !== "undefined";
 }
 
-export const PI_SCOPES = ["username", "payments"];
+export const PI_SCOPES = ["username", "payments", "wallet_address"];
 
 let initPromise: Promise<void> | null = null;
 export function initPi(): Promise<void> {
