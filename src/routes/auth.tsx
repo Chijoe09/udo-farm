@@ -81,8 +81,34 @@ function AuthPage() {
     }
     setLoading(true);
     try {
-      const res = await piAuthenticate(() => {
-        toast.info("An unfinished Pi payment was found. Complete it in your Pi Wallet before starting another payment.");
+      const res = await piAuthenticate((payment) => {
+        const incomplete = payment as {
+          identifier?: unknown;
+          transaction?: { txid?: unknown } | null;
+          metadata?: { orderId?: unknown } | null;
+        };
+        const paymentId = typeof incomplete.identifier === "string" ? incomplete.identifier : null;
+        const txid = typeof incomplete.transaction?.txid === "string" ? incomplete.transaction.txid : null;
+        const orderId = typeof incomplete.metadata?.orderId === "string" ? incomplete.metadata.orderId : null;
+
+        if (!paymentId || !txid || !orderId) {
+          toast.info("An unfinished Pi payment was found, but it needs attention in your Pi Wallet.");
+          return;
+        }
+
+        void fetch("/api/pi/complete", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ paymentId, txid, orderId }),
+        })
+          .then(async (response) => {
+            if (!response.ok) throw new Error(await response.text());
+            toast.success("Your unfinished Pi payment has been completed.");
+          })
+          .catch((error: unknown) => {
+            console.error(error);
+            toast.error("We couldn't finish the earlier Pi payment. Please contact support.");
+          });
       });
       const result = await signIn({
         data: {
