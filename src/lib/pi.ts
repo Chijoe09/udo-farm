@@ -64,14 +64,40 @@ export function isPiBrowserSync(): boolean {
 
 export const PI_SCOPES = ["username", "payments", "wallet_address"];
 
+/** Turn Pi SDK errors (often non-Error objects) into a readable message. */
+export function describePiError(err: unknown): string {
+  if (err instanceof Error && err.message) return err.message;
+  if (typeof err === "string" && err) return err;
+  if (err && typeof err === "object") {
+    const e = err as Record<string, unknown>;
+    if (typeof e.message === "string" && e.message) return e.message;
+    if (typeof e.error === "string" && e.error) return e.error;
+    try {
+      const s = JSON.stringify(e);
+      if (s && s !== "{}") return s;
+    } catch {
+      /* ignore */
+    }
+  }
+  return "Pi sign-in failed. Please try again in the Pi Browser.";
+}
+
 let initPromise: Promise<void> | null = null;
 export function initPi(): Promise<void> {
   if (initPromise) return initPromise;
   initPromise = (async () => {
     const sdk = await waitForPiSDK();
     if (!sdk) throw new Error("Pi SDK not available. Open UDO Farm inside the Pi Browser.");
+    // Pi.init MUST complete before authenticate/createPayment.
     await Promise.resolve(sdk.init({ version: "2.0", sandbox: false }));
+    if (typeof window === "undefined" || !window.Pi) {
+      throw new Error("Pi SDK disappeared after init. Please reload the page in the Pi Browser.");
+    }
   })();
+  // If init fails, allow a later retry instead of caching the rejection forever.
+  initPromise.catch(() => {
+    initPromise = null;
+  });
   return initPromise;
 }
 
