@@ -39,6 +39,7 @@ function AuthPage() {
   const [role, setRole] = useState<"buyer" | "farmer">(search.role ?? "buyer");
   const [loading, setLoading] = useState(false);
   const [inPi, setInPi] = useState(false);
+  const [sdkChecking, setSdkChecking] = useState(true);
 
   useEffect(() => {
     // Poll briefly for the async Pi SDK script to attach window.Pi.
@@ -48,9 +49,14 @@ function AuthPage() {
       if (cancelled) return;
       if (isPiBrowserSync()) {
         setInPi(true);
+        setSdkChecking(false);
         return;
       }
-      if (Date.now() - start < 4000) setTimeout(tick, 150);
+      if (Date.now() - start < 4000) {
+        setTimeout(tick, 150);
+      } else {
+        setSdkChecking(false);
+      }
     };
     tick();
     return () => {
@@ -127,7 +133,7 @@ function AuthPage() {
       });
     } catch (err) {
       console.error(err);
-      toast.error(err instanceof Error ? err.message : "Sign-in failed");
+      toast.error(describePiError(err));
     } finally {
       setLoading(false);
     }
