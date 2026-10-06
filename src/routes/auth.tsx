@@ -167,7 +167,14 @@ function AuthPage() {
             </label>
           </RadioGroup>
 
-          {!inPi && (
+          {sdkChecking && (
+            <div className="mt-5 flex items-center gap-2 rounded-xl bg-muted p-3 text-xs text-muted-foreground">
+              <span className="h-3 w-3 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              <p>Connecting to the Pi Network…</p>
+            </div>
+          )}
+
+          {!sdkChecking && !inPi && (
             <div className="mt-5 flex items-start gap-2 rounded-xl bg-warning/10 p-3 text-xs text-warning-foreground/90">
               <Info className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
               <p>
@@ -178,7 +185,7 @@ function AuthPage() {
 
           <Button
             onClick={handlePiAuth}
-            disabled={loading || !inPi}
+            disabled={loading || sdkChecking || !inPi}
             size="lg"
             className="mt-5 h-12 w-full gradient-brand text-primary-foreground"
           >
