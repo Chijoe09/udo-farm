@@ -48,11 +48,13 @@ export type Database = {
           delivery_address: string | null
           delivery_fee_pi: number
           delivery_type: Database["public"]["Enums"]["delivery_type"]
+          expires_at: string
           id: string
           notes: string | null
           product_id: string
           quantity: number
           status: Database["public"]["Enums"]["order_status"]
+          stock_reserved: boolean
           total_price_pi: number
           updated_at: string
         }
@@ -62,11 +64,13 @@ export type Database = {
           delivery_address?: string | null
           delivery_fee_pi?: number
           delivery_type?: Database["public"]["Enums"]["delivery_type"]
+          expires_at?: string
           id?: string
           notes?: string | null
           product_id: string
           quantity: number
           status?: Database["public"]["Enums"]["order_status"]
+          stock_reserved?: boolean
           total_price_pi: number
           updated_at?: string
         }
@@ -76,11 +80,13 @@ export type Database = {
           delivery_address?: string | null
           delivery_fee_pi?: number
           delivery_type?: Database["public"]["Enums"]["delivery_type"]
+          expires_at?: string
           id?: string
           notes?: string | null
           product_id?: string
           quantity?: number
           status?: Database["public"]["Enums"]["order_status"]
+          stock_reserved?: boolean
           total_price_pi?: number
           updated_at?: string
         }
@@ -312,6 +318,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cancel_pending_pi_order: {
+        Args: { p_order_id: string }
+        Returns: boolean
+      }
+      clear_stale_seller_orders: { Args: never; Returns: number }
       complete_pi_order: {
         Args: {
           p_amount: number
@@ -323,6 +334,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      expire_pending_orders: { Args: never; Returns: number }
       get_my_profile: {
         Args: never
         Returns: {
@@ -341,6 +353,18 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      reserve_pi_order: {
+        Args: {
+          p_delivery_address: string
+          p_delivery_fee_pi: number
+          p_delivery_type: Database["public"]["Enums"]["delivery_type"]
+          p_notes: string
+          p_product_id: string
+          p_quantity: number
+          p_total_price_pi: number
+        }
+        Returns: string
       }
     }
     Enums: {
