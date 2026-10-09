@@ -9,17 +9,18 @@ const requestSchema = z.object({
 async function verifyPiPayment(paymentId: string, orderId: string, apiKey: string, walletAddress: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data: order } = await supabaseAdmin.from("orders")
-    .select("id,buyer_id,product_id,quantity,total_price_pi,status")
+    .select("id,buyer_id,product_id,quantity,total_price_pi,status,expires_at,stock_reserved,delivery_fee_pi")
     .eq("id", orderId).maybeSingle();
   if (!order || order.status !== "PENDING_PAYMENT") throw new Error("Order is not awaiting payment");
+  if (new Date(order.expires_at).getTime() <= Date.now()) throw new Error("Order expired");
   const { data: product } = await supabaseAdmin.from("products")
     .select("price_per_unit,live_inventory").eq("id", order.product_id).maybeSingle();
   if (!product || Number(product.price_per_unit) < 0.001 || Number(product.price_per_unit) > 0.1) {
     throw new Error("Product price is outside Pi policy");
   }
-  if (Number(product.live_inventory) < Number(order.quantity)) throw new Error("Insufficient inventory");
+  if (!order.stock_reserved && Number(product.live_inventory) < Number(order.quantity)) throw new Error("Insufficient inventory");
   const expectedAmount = Number(order.total_price_pi);
-  const productTotal = Number((Number(product.price_per_unit) * Number(order.quantity)).toFixed(7));
+  const productTotal = Number((Number(product.price_per_unit) * Number(order.quantity) + Number(order.delivery_fee_pi)).toFixed(7));
   if (!Number.isFinite(expectedAmount) || Math.abs(expectedAmount - productTotal) > 0.0000001) {
     throw new Error("Order amount does not match product price");
   }

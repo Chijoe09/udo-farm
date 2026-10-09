@@ -21,10 +21,13 @@ export const Route = createFileRoute("/api/public/pi/complete")({
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { data: order } = await supabaseAdmin.from("orders")
-          .select("id,buyer_id,product_id,quantity,total_price_pi,status")
+          .select("id,buyer_id,product_id,quantity,total_price_pi,status,expires_at,delivery_fee_pi")
           .eq("id", orderId).maybeSingle();
         if (!order || !["PENDING_PAYMENT", "PAID"].includes(order.status)) {
           return new Response("Order is not awaiting payment", { status: 400 });
+        }
+        if (order.status === "PENDING_PAYMENT" && new Date(order.expires_at).getTime() <= Date.now()) {
+          return new Response("Order expired", { status: 400 });
         }
         const { data: product } = await supabaseAdmin.from("products")
           .select("price_per_unit,live_inventory").eq("id", order.product_id).maybeSingle();
@@ -32,7 +35,7 @@ export const Route = createFileRoute("/api/public/pi/complete")({
           return new Response("Product price is outside Pi policy", { status: 400 });
         }
         const expectedAmount = Number(order.total_price_pi);
-        const expectedTotal = Number((Number(product.price_per_unit) * Number(order.quantity)).toFixed(7));
+        const expectedTotal = Number((Number(product.price_per_unit) * Number(order.quantity) + Number(order.delivery_fee_pi)).toFixed(7));
         if (Math.abs(expectedAmount - expectedTotal) > 0.0000001) return new Response("Order amount does not match product price", { status: 400 });
 
         const verifyRes = await fetch(`https://api.minepi.com/v2/payments/${encodeURIComponent(paymentId)}`, {

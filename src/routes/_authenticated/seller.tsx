@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Plus, Package, TrendingUp, Clock, CheckCircle2, XCircle } from "lucide-react";
+import { Plus, Package, TrendingUp, Clock, CheckCircle2, XCircle, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
@@ -8,14 +10,26 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useSession } from "@/hooks/use-session";
 import { format } from "date-fns";
+import { toast } from "sonner";
+import { formatPiAmount } from "@/lib/format";
+import { clearStaleSellerOrders } from "@/lib/seller.functions";
 
 export const Route = createFileRoute("/_authenticated/seller")({
-  head: () => ({ meta: [{ title: "Seller dashboard — UDO Farm" }] }),
+  head: () => ({ meta: [
+    { title: "Seller dashboard — UDO Farm" },
+    { name: "description", content: "Manage UDO Farm produce listings, orders, and Pi earnings." },
+    { property: "og:title", content: "Seller dashboard — UDO Farm" },
+    { property: "og:description", content: "Manage UDO Farm produce listings, orders, and Pi earnings." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: SellerDashboard,
 });
 
 function SellerDashboard() {
   const { userId, piUsername } = useSession();
+  const clearStaleOrders = useServerFn(clearStaleSellerOrders);
+  const [clearingOrders, setClearingOrders] = useState(false);
 
   const productsQ = useQuery({
     queryKey: ["seller", "products", userId],
@@ -77,8 +91,8 @@ function SellerDashboard() {
         </div>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-3">
-          <StatCard label="Total Pi Earned" value={`${earnings.toFixed(2)} π`} icon={TrendingUp} tone="success" />
-          <StatCard label="This month" value={`${monthEarnings.toFixed(2)} π`} icon={TrendingUp} tone="primary" />
+          <StatCard label="Total Pi Earned" value={`${formatPiAmount(earnings)} π`} icon={TrendingUp} tone="success" />
+          <StatCard label="This month" value={`${formatPiAmount(monthEarnings)} π`} icon={TrendingUp} tone="primary" />
           <StatCard label="Active listings" value={String(productsQ.data?.filter((p) => p.status === "APPROVED").length ?? 0)} icon={Package} tone="warning" />
         </div>
 
@@ -108,7 +122,28 @@ function SellerDashboard() {
         </section>
 
         <section className="mt-10">
-          <h2 className="font-display text-2xl font-bold">Incoming orders</h2>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="font-display text-2xl font-bold">Incoming orders</h2>
+            <Button
+              variant="outline"
+              disabled={clearingOrders}
+              onClick={async () => {
+                setClearingOrders(true);
+                try {
+                  const result = await clearStaleOrders();
+                  toast.success(`${result.deletedCount} old unpaid order${result.deletedCount === 1 ? "" : "s"} cleared`);
+                  await ordersQ.refetch();
+                } catch (error) {
+                  toast.error(error instanceof Error ? error.message : "Could not clear old orders");
+                } finally {
+                  setClearingOrders(false);
+                }
+              }}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              {clearingOrders ? "Clearing…" : "Clear test orders"}
+            </Button>
+          </div>
           <div className="mt-4 space-y-3">
             {ordersQ.data?.length === 0 && (
               <Card className="p-8 text-center text-muted-foreground">No orders yet.</Card>
@@ -121,7 +156,7 @@ function SellerDashboard() {
                       {o.quantity} {(o.products as unknown as { unit: string }).unit}s of {(o.products as unknown as { title: string }).title}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {format(new Date(o.created_at), "PPP")} · {o.delivery_type} · {Number(o.total_price_pi).toFixed(2)} π
+                      {format(new Date(o.created_at), "PPP")} · {o.delivery_type} · {formatPiAmount(o.total_price_pi)} π
                     </p>
                   </div>
                   <OrderStatusActions orderId={o.id} status={o.status} onDone={() => ordersQ.refetch()} />

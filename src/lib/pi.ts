@@ -89,7 +89,7 @@ export function initPi(): Promise<void> {
     const sdk = await waitForPiSDK();
     if (!sdk) throw new Error("Pi SDK not available. Open UDO Farm inside the Pi Browser.");
     // Pi.init MUST complete before authenticate/createPayment.
-    await Promise.resolve(sdk.init({ version: "2.0", sandbox: false }));
+    await Promise.resolve(sdk.init({ version: "2.0", sandbox: true }));
     if (typeof window === "undefined" || !window.Pi) {
       throw new Error("Pi SDK disappeared after init. Please reload the page in the Pi Browser.");
     }
