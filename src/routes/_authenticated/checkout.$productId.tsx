@@ -14,11 +14,19 @@ import { toast } from "sonner";
 import { piCreatePayment } from "@/lib/pi";
 import { Truck, MapPin, ShieldCheck } from "lucide-react";
 import { z } from "zod";
+import { formatPiAmount } from "@/lib/format";
 
 const searchSchema = z.object({ apply: z.boolean().optional() });
 
 export const Route = createFileRoute("/_authenticated/checkout/$productId")({
-  head: () => ({ meta: [{ title: "Checkout — UDO Farm" }] }),
+  head: () => ({ meta: [
+    { title: "Checkout — UDO Farm" },
+    { name: "description", content: "Review your fresh produce order and pay securely with Pi." },
+    { property: "og:title", content: "Checkout — UDO Farm" },
+    { property: "og:description", content: "Review your fresh produce order and pay securely with Pi." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   validateSearch: searchSchema,
   component: Checkout,
 });
@@ -80,35 +88,29 @@ function Checkout() {
     setProcessing(true);
     try {
       // 1. Create order (PENDING_PAYMENT)
-      const { data: order, error: orderErr } = await supabase
-        .from("orders")
-        .insert({
-          buyer_id: userId,
-          product_id: p.id,
-          quantity,
-          total_price_pi: total,
-          delivery_type: deliveryType,
-          delivery_address: deliveryType === "DELIVERY" ? address : null,
-          delivery_fee_pi: deliveryFee,
-          notes: notes || null,
-          status: "PENDING_PAYMENT",
-        })
-        .select("id")
-        .single();
-      if (orderErr || !order) throw orderErr ?? new Error("Order failed");
+      const { data: orderId, error: orderErr } = await supabase.rpc("reserve_pi_order", {
+        p_product_id: p.id,
+        p_quantity: quantity,
+        p_total_price_pi: total,
+        p_delivery_type: deliveryType,
+        p_delivery_address: deliveryType === "DELIVERY" ? address : null,
+        p_delivery_fee_pi: deliveryFee,
+        p_notes: notes || null,
+      });
+      if (orderErr || !orderId) throw orderErr ?? new Error("Order failed");
 
       await piCreatePayment(
         {
           amount: total,
           memo: `UDO Farm: ${p.title}`,
-          metadata: { orderId: order.id, productId: p.id },
+            metadata: { orderId, productId: p.id },
         },
         {
           onReadyForServerApproval: async (paymentId) => {
             const response = await fetch("/api/pi/approve", {
               method: "POST",
               headers: { "content-type": "application/json" },
-              body: JSON.stringify({ paymentId, orderId: order.id }),
+              body: JSON.stringify({ paymentId, orderId }),
             });
             if (!response.ok) throw new Error(await response.text());
           },
@@ -116,17 +118,19 @@ function Checkout() {
             const response = await fetch("/api/pi/complete", {
               method: "POST",
               headers: { "content-type": "application/json" },
-              body: JSON.stringify({ paymentId, txid, orderId: order.id }),
+              body: JSON.stringify({ paymentId, txid, orderId }),
             });
             if (!response.ok) throw new Error(await response.text());
             toast.success("Payment complete!");
             navigate({ to: "/orders" });
           },
           onCancel: () => {
+            void supabase.rpc("cancel_pending_pi_order", { p_order_id: orderId });
             toast.error("Payment cancelled");
             setProcessing(false);
           },
           onError: (err) => {
+            void supabase.rpc("cancel_pending_pi_order", { p_order_id: orderId });
             toast.error(`Payment error: ${err.message}`);
             setProcessing(false);
           },
@@ -153,7 +157,7 @@ function Checkout() {
             <div className="flex-1">
               <p className="font-semibold">{p.title}</p>
               <p className="text-sm text-muted-foreground">
-                @{(p.profiles as unknown as { pi_username: string } | null)?.pi_username} · {p.price_per_unit} π / {p.unit}
+                @{(p.profiles as unknown as { pi_username: string } | null)?.pi_username} · {formatPiAmount(p.price_per_unit)} π / {p.unit}
               </p>
             </div>
           </div>
@@ -250,10 +254,6 @@ function Row({ label, value }: { label: string; value: string }) {
 }
 
 function fmtPi(n: number) {
-  if (!isFinite(n)) return "0";
-  if (n === 0) return "0";
-  // Show up to 7 decimals, strip trailing zeros; ensure tiny amounts aren't rounded to 0.00
-  const s = n.toFixed(7).replace(/\.?0+$/, "");
-  return s || "0";
+  return formatPiAmount(n);
 }
 

@@ -7,9 +7,17 @@ import { Badge } from "@/components/ui/badge";
 import { useSession } from "@/hooks/use-session";
 import { format } from "date-fns";
 import { CheckCircle2, Circle, CircleDot } from "lucide-react";
+import { formatPiAmount } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/orders")({
-  head: () => ({ meta: [{ title: "My orders — UDO Farm" }] }),
+  head: () => ({ meta: [
+    { title: "My orders — UDO Farm" },
+    { name: "description", content: "Track your UDO Farm produce purchases and delivery progress." },
+    { property: "og:title", content: "My orders — UDO Farm" },
+    { property: "og:description", content: "Track your UDO Farm produce purchases and delivery progress." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: OrdersPage,
 });
 
@@ -65,7 +73,7 @@ function OrdersPage() {
                         {product?.title}
                       </Link>
                       <p className="text-sm text-muted-foreground">
-                        {o.quantity} {product?.unit}s · {Number(o.total_price_pi).toFixed(2)} π · {o.delivery_type}
+                        {o.quantity} {product?.unit}s · {formatPiAmount(o.total_price_pi)} π · {o.delivery_type}
                       </p>
                       <p className="text-xs text-muted-foreground">{format(new Date(o.created_at), "PPP")}</p>
                     </div>
