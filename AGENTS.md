@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Keep Pi payment callbacks on public API routes with server-side verification; thin aliases may expose the requested `/api/pi/*` URLs while forwarding to those protected handlers so Pi callbacks remain reachable without bypassing validation.
+- Create paid orders through transactional database functions and expire abandoned reservations in the database, so checkout keeps inventory consistent when buyers leave.
